@@ -14,8 +14,12 @@ First put `parentlevel` to your favorite location, and adjust the 5th line of `c
 ## Usage
 
 	up: same as `cd ..`
-	up DIR: same as `cd ..` for N times where N is the smallest nonnegative integer such that the target directory is named "DIR"
-	up '/DIR': same as `cd ..` for N times where N is the smallest nonnegative integer such that the target directory's name matches "DIR" as a python-style regular expression
+	up DIR: same as `cd ..` for N times where N is the smallest
+	        nonnegative integer such that the target directory is
+	        named "DIR"
+	up '/DIR': same as `cd ..` for N times where N is the smallest
+	           nonnegative integer such that the target directory's
+	           name matches "DIR" as a python-style regular expression
 
 One difference from "`cd ..` for N times" is that `up` function addresses the `OLDPWD` better than `cd ..` multiple times.
 
