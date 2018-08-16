@@ -31,3 +31,7 @@ Several use cases:
 	/home/user/directory1/directory2:$ up '/d*1'
 	/home/user/directory1:$ cd -
 	/home/user/directory1/directory2:$ 
+
+## Compatibility
+
+The shell function is not POSIX-compatible due to a bash-specific for loop. The author don't have much time to improve it. The depended python script `parentlevel`, which returns the number of times needed to perform `cd ..`, has compatibility for Python 2/3 and all platforms.
