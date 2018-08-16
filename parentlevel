@@ -1,0 +1,82 @@
+#!/usr/bin/env python
+from __future__ import print_function
+import argparse
+import sys
+import itertools
+import re
+import os
+
+# ERROR_CODE
+NO_MATCH = 1
+REGEX_ERROR = 2
+
+def make_parser():
+    parser = argparse.ArgumentParser(description='See how many levels up the '
+                                     'specified directory is relative to '
+                                     'current working directory. For example, '
+                                     'if current working directory is '
+                                     '"/home/user/Desktop", then "Directory" '
+                                     'is 0 level up, and "home" is 2 levels '
+                                     'up.',
+                                     epilog='Error code: 0) no error; 1) no '
+                                     'match; 2) regex error.')
+    parser.add_argument('dir', help='the directory name to query')
+    parser.add_argument('-e', '--regex', action='store_true',
+                        help='enable regex in positional argument `dir`')
+    parser.add_argument('-a', '--all', action='store_true',
+                        help='return all matched results, each in one line, '
+                             'rather than only the nearest match')
+    return parser
+
+def is_fsroot(directory):
+    # answer from "https://stackoverflow.com/questions/9823143/check-if-a-directory-is-a-file-system-root";
+    # does not work when there's ".." in `directory`
+    if '..' in directory:
+        raise ValueError('Not supported .. in directory ({})'
+                         .format(directory))
+    return os.path.dirname(directory) == directory
+
+def match_parent(parent):
+    cwd = os.getcwd()
+    matched_levels = []
+    for l in itertools.count():
+        if is_fsroot(cwd):
+            break
+        if parent == os.path.basename(cwd):
+            matched_levels.append(l)
+        cwd = os.path.dirname(cwd)
+    return matched_levels
+
+def match_parent_regex(parent):
+    cwd = os.getcwd()
+    matched_levels = []
+    parent_pat = re.compile(parent)
+    for l in itertools.count():
+        if is_fsroot(cwd):
+            break
+        if parent_pat.match(os.path.basename(cwd)):
+            matched_levels.append(l)
+        cwd = os.path.dirname(cwd)
+    return matched_levels
+
+def main():
+    args = make_parser().parse_args()
+    if args.regex:
+        try:
+            levels = match_parent_regex(args.dir)
+        except re.error:
+            print('Bad regex: {}'.format(args.dir))
+            sys.exit(REGEX_ERROR)
+    else:
+        levels = match_parent(args.dir)
+
+    if len(levels):
+        if args.all:
+            print('\n'.join(map(str, levels)))
+        else:
+            print(str(levels[0]))
+    else:
+        sys.exit(NO_MATCH)
+
+if __name__ == '__main__':
+    main()
