@@ -10,14 +10,16 @@ Source `cdup.sh`.
 
 ## Usage
 
-	up: same as `cd ..`
-	up -n LEVEL: same as `cd ..` for LEVEL times
-	up DIR: same as `cd ..` for N times where N is the smallest
-	        nonnegative integer such that the target directory is
-	        named "DIR"
-	up '/DIR/': same as `cd ..` for N times where N is the smallest
-	            nonnegative integer such that the target directory's
-	            name matches "DIR" as a grep-style regular expression
+	Usage: up                   Same as `cd ..'
+	       up -n LEVEL          Same as `cd ../.. etc.' (LEVEL `..'s)
+	       up NAME              Go upwards to the nearest directory named NAME
+	       up /REGEX/           Go upwards to the nearest directory matching REGEX
+				    (grep-style regex)
+	       ... [-s DIR]         Any command pattern above plus this option will
+				    go up to the underlying ancestor directory before
+				    going downwards to DIR, such that there's only one
+				    `cd' action
+	       up [-h | --help]     Show this help and exit
 
 One difference from "`cd ..` for N times" is that `up` function addresses the `OLDPWD` better than `cd ..` multiple times.
 
