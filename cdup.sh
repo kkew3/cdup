@@ -95,11 +95,11 @@ up() {
 					;;
 			esac
 		fi
-		if [ -n "$rule_type" ] || [ -n "$rule_value" ]; then
-			echo "UPWARD_RULE has already been specified" >&2
-			return 2
-		fi
 		if ! $option_parsed; then
+			if [ -n "$rule_type" ] || [ -n "$rule_value" ]; then
+				echo "UPWARD_RULE has already been specified" >&2
+				return 2
+			fi
 			case "$1" in
 				-n*)
 					rule_type="n"
