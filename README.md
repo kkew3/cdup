@@ -77,3 +77,11 @@ Several use cases:
 	/home/user/directory1/directory2:$ up '/d*1/'
 	/home/user/directory1:$ cd -
 	/home/user/directory1/directory2:$ 
+
+
+## Similar projects
+
+I just realized that there were already a number of projects addressing this use case.
+I wouldn't spend time on this should I be aware of it earlier!
+
+- https://github.com/westonruter/misc-cli-tools/blob/master/cdup
