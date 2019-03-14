@@ -176,7 +176,7 @@ up() {
 					esac
 					;;
 				*)
-					rule_type="n"
+					rule_type="raw"
 					rule_value="$1"
 					;;
 			esac
