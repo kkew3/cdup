@@ -10,7 +10,7 @@ Source `cdup.sh`.
 
 ## Usage
 
-> Copied from `cd -h'
+> Copied from `up -h`
 
 ```plain
 Usage: up [OPTIONS...] [[--] UPWARD_RULE]
