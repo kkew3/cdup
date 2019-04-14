@@ -64,14 +64,8 @@ def predicate_raw(string, cwd):
 
 
 def predicate_glob(pattern, cwd):
-    d = os.path.dirname(cwd)
-    names = [x for x in os.listdir(d) if os.path.isdir(os.path.join(d, x))]
-    logging.debug('(glob) %s -> pattern=%r; names=%r', cwd, pattern, names)
-    gbdirs = fnmatch.filter(names, pattern)
-    # gb = glob.iglob(os.path.join(glob.escape(os.path.dirname(cwd)), pattern))
-    # gbdirs = filter(os.path.isdir, gb)
-    matches = (os.path.basename(cwd) == x for x in gbdirs)
-    return any(matches)
+    name = os.path.basename(cwd)
+    return fnmatch.fnmatch(name, pattern)
 
 
 def predicate_ere(pattern, cwd):
