@@ -16,7 +16,8 @@
 - `cdup.py` uses `python` as default interpreter, which is likely to in fact
   point to `python2.7` or older. To make it run in `python3`, try
   `alias "/path/to/a/python3/interpreter" "/path/to/cdup.py" up` rather than
-  the aforementioned alias.
+  the aforementioned alias. Note that this doesn't mean `python2.7` cannot
+  be used, though.
 
 
 ## Usage
