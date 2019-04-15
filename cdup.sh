@@ -60,6 +60,9 @@ up() {
 		echo "Requiring env variable __UP_BACKEND" >&2
 		return 8
 	fi
+	if [ -z "$__UP_PYTHON" ]; then
+		__UP_PYTHON=python3
+	fi
 	local listonly=
 	local subdir=
 	local rule_value=
@@ -182,7 +185,7 @@ up() {
 		rule_value=1
 	fi
 
-	todir="$("$__UP_BACKEND" "$rule_type" "$rule_value" "$subdir")"
+	todir="$("$__UP_PYTHON" "$__UP_BACKEND" "$rule_type" "$rule_value" "$subdir")"
 	local retcode="$?"
 	if [ "$retcode" != 0 ]; then
 		return "$retcode"

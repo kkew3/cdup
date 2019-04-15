@@ -1,9 +1,9 @@
-#!/usr/bin/env python
 import sys
 import os
 import re
-from functools import partial
+import functools
 import fnmatch
+import subprocess
 import logging
 
 ERROR_ARGS = 2
@@ -25,6 +25,17 @@ def parse_args():
         return ruletype, rulevalue, subsequent
     except IndexError:
         sys.exit(ERROR_ARGS)
+
+
+def getcwd():
+    """
+    Not using ``os.getcwd()`` unless in Win32 because it resolves symlink as
+    per POSIX.1-2008 (IEEE Std 1003.1-2008). End user may adapt this function
+    to suit the underlying platform.
+    """
+    if sys.platform == 'win32':
+        return os.getcwd()
+    return os.environ['PWD']
 
 
 def search_upward(fromdir, condition):
@@ -76,13 +87,20 @@ def predicate_ere(pattern, cwd):
     return bool(found)
 
 
+predicate_by_ruletype = {
+    'raw': predicate_raw,
+    'glob': predicate_glob,
+    'ere': predicate_ere,
+}
+
+
 def main():
     ruletype, rulevalue, subsequent = parse_args()
-    cwd = os.path.abspath(os.getcwd())
+    cwd = os.path.abspath(getcwd())
     if ruletype == 'n':
         todir = upward_atmost(cwd, int(rulevalue))
     elif ruletype in RULE_TYPES:
-        c = partial(globals()['predicate_' + ruletype], rulevalue)
+        c = functools.partial(predicate_by_ruletype[ruletype], rulevalue)
         todir = search_upward(cwd, c)
     else:
         sys.exit(ERROR_ARGS)
@@ -98,4 +116,5 @@ def main():
     sys.exit(0)
 
 
-main()
+if __name__ == '__main__':
+    main()

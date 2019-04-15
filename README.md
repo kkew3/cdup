@@ -13,11 +13,9 @@
 - `up` requires an environment variable `__UP_BACKEND` to tell the location
   of the backend executable it depends on. You don't have to export one for
   it -- instead, try `alias up='__UP_BACKEND="/path/to/cdup.py" up'`.
-- `cdup.py` uses `python` as default interpreter, which is likely to in fact
-  point to `python2.7` or older. To make it run in `python3`, try
-  `alias "/path/to/a/python3/interpreter" "/path/to/cdup.py" up` rather than
-  the aforementioned alias. Note that this doesn't mean `python2.7` cannot
-  be used, though.
+- `up` requires an optional environment variable `__UP_PYTHON` to tell the
+  name or location of the python interpreter to use; if not specified, it's
+  default to `python3`.
 
 
 ## Usage
