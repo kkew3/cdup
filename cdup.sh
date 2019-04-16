@@ -2,7 +2,7 @@
 
 __up_help() {
 	cat << EOF
-Usage: up [OPTIONS...] [[--] UPWARD_RULE]
+usage: up [OPTIONS...] [[--] UPWARD_RULE]
 
 OPTIONS
 
