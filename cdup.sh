@@ -24,9 +24,9 @@ UPWARD_RULE
                             NUM_LEVELS is default to 1 if not specified. In
                             the second form, if NUM_LEVELS does not start with
                             \`n' (in which case it falls back to the first
-                            form) and contains non-digit characters, the
-                            entire \`-NUM_LEVELS' will be interpreted as
-                            \`NAME' (see below)
+                            form) and contains non-digit characters, or if
+                            NUM_LEVELS is empty, the entire \`-NUM_LEVELS'
+                            will be interpreted as \`NAME' (see below)
         [-r] NAME           Go upwards to the nearest directory named NAME.
                             The optional \`-r' disambiguates conflicts with
                             the \`/PATTERN/' rule below when NAME starts with
@@ -159,6 +159,10 @@ up() {
 						echo "REGEX missing" >&2
 						return 2
 					fi
+					;;
+				-)
+					rule_type="raw"
+					rule_value="-"
 					;;
 				-*)
 					case "${1:1}" in
