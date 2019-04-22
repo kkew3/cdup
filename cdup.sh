@@ -57,11 +57,10 @@ EOF
 
 up() {
 	if [ -z "$__UP_BACKEND" ]; then
-		echo "Requiring env variable __UP_BACKEND" >&2
-		return 8
+		local __UP_BACKEND="$(dirname "${BASH_SOURCE[0]}")/__pycache__/cdup.cpython-36.pyc"
 	fi
 	if [ -z "$__UP_PYTHON" ]; then
-		__UP_PYTHON=python3
+		local __UP_PYTHON=python3
 	fi
 	local listonly=
 	local subdir=
