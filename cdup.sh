@@ -34,6 +34,7 @@ UPWARD_RULE
         /PATTERN/           Go upwards to the nearest directory matching the
                             python-style globbing pattern PATTERN. Be sure to
                             add quote around PATTERN to avoid unnecessary
+                            shell expansion
         -E REGEX            Go upwards to the nearest directory matching the
                             python REGEX
 
