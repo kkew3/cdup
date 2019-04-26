@@ -5,17 +5,19 @@
 
 ## Installation
 
-1. Adapt the code to your need (see below)
+1. Adapt the code to your need (optional, see below)
 2. Source `cdup.sh`.
 
 ### Adapt the code to your need
 
-- `up` requires an environment variable `__UP_BACKEND` to tell the location
-  of the backend executable it depends on. You don't have to export one for
-  it -- instead, try `alias up='__UP_BACKEND="/path/to/cdup.py" up'`.
-- `up` requires an optional environment variable `__UP_PYTHON` to tell the
-  name or location of the python interpreter to use; if not specified, it's
-  default to `python3`.
+At the beginning of `up` function definition in `cdup.sh`:
+
+- `up` requires local environment variable `up_backend` to point to the
+  `cdup.py` or its compiled `pyc` file (to reduce setup overhead). One may
+  compile `cdup.py` one his/her machine and set `up_backend` to the compiled
+  file.
+- `up` requires local environment variable `up_pythonbin` to point to the
+  python executable to use to run `cdup.py`. Python 2.7-3.x are supported.
 
 
 ## Usage

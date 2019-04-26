@@ -56,12 +56,13 @@ EOF
 }
 
 up() {
-	if [ -z "$__UP_BACKEND" ]; then
-		local __UP_BACKEND="$(dirname "${BASH_SOURCE[0]}")/__pycache__/cdup.cpython-36.pyc"
+	local up_basedir="$(dirname "${BASH_SOURCE[0]}")"
+	local up_backend="$up_basedir/__pycache__/cdup.cpython-36.pyc"
+	if [ ! -f "$up_backend" ]; then
+		up_backend="$up_basedir/cdup.py"
 	fi
-	if [ -z "$__UP_PYTHON" ]; then
-		local __UP_PYTHON=python3
-	fi
+	local up_pythonbin="python3"
+
 	local listonly=
 	local subdir=
 	local rule_value=
@@ -188,7 +189,7 @@ up() {
 		rule_value=1
 	fi
 
-	todir="$("$__UP_PYTHON" "$__UP_BACKEND" "$rule_type" "$rule_value" "$subdir")"
+	todir="$("$up_pythonbin" "$up_backend" "$rule_type" "$rule_value" "$subdir")"
 	local retcode="$?"
 	if [ "$retcode" != 0 ]; then
 		return "$retcode"
