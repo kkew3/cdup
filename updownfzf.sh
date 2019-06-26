@@ -7,18 +7,22 @@
 __updown_up() {
 	local curdir="$(pwd)"
 	local nextdir
-	while [ "$curdir" != "$HOME" ]; do
+	if [ "$curdir" = "$HOME" ] || [ "$curdir" = "/" ]; then
 		echo "$curdir"
-		nextdir="$(dirname "$curdir")"
-		if [ "$nextdir" = "$curdir" ]; then
-			break
-		fi
-		curdir="$nextdir"
-	done
+	else
+		while [ "$curdir" != "$HOME" ]; do
+			echo "$curdir"
+			nextdir="$(dirname "$curdir")"
+			if [ "$nextdir" = "$curdir" ]; then
+				break
+			fi
+			curdir="$nextdir"
+		done
+	fi
 }
 
 __updown_down() {
-	find "$1"/ -mindepth 1 -type d -print
+	find "$1"/ -mindepth 1 ! -readable -prune -o -path '*/.*/*' -prune -o -type d -print
 }
 
 ud() {
