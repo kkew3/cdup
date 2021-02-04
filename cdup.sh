@@ -62,7 +62,7 @@ up() {
 	if [ ! -f "$up_backend" ]; then
 		up_backend="$up_basedir/cdup.py"
 	fi
-	local up_pythonbin="python3"
+	local up_pythonbin="/Library/Frameworks/Python.framework/Versions/3.6/bin/python3.6"
 
 	local listonly=
 	local subdir=
