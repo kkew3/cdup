@@ -4,6 +4,8 @@
 # up-down using fzf
 #
 
+[ "$(uname)" = Darwin ] && FIND=gfind || FIND=find
+
 __updown_up() {
 	local curdir="$(pwd)"
 	local nextdir
@@ -22,7 +24,12 @@ __updown_up() {
 }
 
 __updown_down() {
-	find "$1"/ -mindepth 1 ! -readable -prune -o -path '*/.*/*' -prune -o -type d -print
+	echo "$1"
+	$FIND "$1"/ -mindepth 1 \
+		! -readable -prune -o \
+		-path '*/.*/*' -prune -o \
+		-path '*/rt/*' -prune -o \
+		-type d -print
 }
 
 ud() {
