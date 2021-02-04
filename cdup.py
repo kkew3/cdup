@@ -3,7 +3,6 @@ import os
 import re
 import functools
 import fnmatch
-import subprocess
 import logging
 
 ERROR_ARGS = 2
@@ -48,8 +47,9 @@ def search_upward(fromdir, condition):
            returns ``current_directory``
     """
     cwd = fromdir
-    if condition(cwd):
-        return cwd
+    # commented out so that the parent dir of cwd is the first string to match
+    #if condition(cwd):
+    #    return cwd
     next_cwd = os.path.dirname(cwd)
     while not os.path.samefile(cwd, next_cwd):
         cwd = next_cwd
@@ -70,7 +70,7 @@ def upward_atmost(fromdir, n):
 
 
 def predicate_raw(string, cwd):
-    logging.debug('(raw) %s -> pattern=%r',  cwd, string)
+    logging.debug('(raw) %s -> pattern=%r', cwd, string)
     return string == os.path.basename(cwd)
 
 
