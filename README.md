@@ -93,7 +93,7 @@ Several use cases:
 	/home/user/directory1:$ cd -
 	/home/user/directory1/directory2:$ 
 
-# Additional script using `fzf`
+# Additional script using [`fzf`](https://github.com/junegunn/fzf)
 
 `updownfzf.sh` gives function `ud` that let the user first goes up and then goes down by selecting in `fzf` menu.
 
