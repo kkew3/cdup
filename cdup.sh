@@ -1,4 +1,5 @@
 #!/bin/bash
+# also exposed to /bin/zsh
 
 __up_help() {
 	cat << EOF
@@ -57,9 +58,14 @@ EOF
 }
 
 up() {
-	local up_basedir="$(dirname "${BASH_SOURCE[0]}")"
+	# compatible with bash then zsh;
+	# reference: https://stackoverflow.com/a/54755784/7881370
+	local up_basedir=$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")
 	local up_backend="$up_basedir/__pycache__/cdup.cpython-36.pyc"
 	if [ ! -f "$up_backend" ]; then
+		up_backend="$up_basedir/cdup.py"
+	elif [ "$up_backend" -ot "$up_basedir/cdup.py" ]; then
+		rm "$up_backend"
 		up_backend="$up_basedir/cdup.py"
 	fi
 	local up_pythonbin="/Library/Frameworks/Python.framework/Versions/3.6/bin/python3.6"
