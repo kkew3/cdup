@@ -6,7 +6,7 @@
 ## Installation
 
 1. Adapt the code to your need (optional, see below)
-2. Source `cdup.sh`.
+2. Source the absolute path of `cdup.sh`.
 
 ### Adapt the code to your need
 
@@ -25,7 +25,7 @@ At the beginning of `up` function definition in `cdup.sh`:
 > Copied from `up -h`
 
 ```plain
-Usage: up [OPTIONS...] [[--] UPWARD_RULE]
+usage: up [OPTIONS...] [[--] UPWARD_RULE]
 
 OPTIONS
 
@@ -41,20 +41,16 @@ UPWARD_RULE
     Can be one of:
 
         <Nothing>           Same as `cd ..'
-        -n [NUM_LEVELS], -NUM_LEVELS
-                            Same as `cd ..' NUM_LEVELS time but there will be
-                            only one `cd' action in total. In the first form,
-                            NUM_LEVELS is default to 1 if not specified. In
-                            the second form, if NUM_LEVELS does not start with
-                            `n' (in which case it falls back to the first
-                            form) and contains non-digit characters, or if
-                            NUM_LEVELS is empty, the entire `-NUM_LEVELS'
-                            will be interpreted as `NAME' (see below)
+        -NUM_LEVELS         Same as `cd ..' NUM_LEVELS time but there will be
+                            only one `cd' action in total. If NUM_LEVELS
+                            contains non-digit characters, or if NUM_LEVELS
+                            is empty, the entire `-NUM_LEVELS' will be
+                            interpreted as `NAME' (see below). If NUM_LEVELS
+                            is `0', nothing will be done
         [-r] NAME           Go upwards to the nearest directory named NAME.
-                            The optional `-r' disambiguates conflicts with
-                            the `/PATTERN/' rule below when NAME starts with
-                            a slash (`/')
-        /PATTERN/           Go upwards to the nearest directory matching the
+                            The optional `-r' disambiguates cases when NAME
+                            starts with `-'
+        -g PATTERN          Go upwards to the nearest directory matching the
                             python-style globbing pattern PATTERN. Be sure to
                             add quote around PATTERN to avoid unnecessary
                             shell expansion
@@ -89,7 +85,7 @@ Several use cases:
 	/home/user:$ cd -
 	/home/user/directory1/directory2:$ 
 
-	/home/user/directory1/directory2:$ up '/d*1/'
+	/home/user/directory1/directory2:$ up -g'd*1'
 	/home/user/directory1:$ cd -
 	/home/user/directory1/directory2:$ 
 
