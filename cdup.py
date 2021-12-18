@@ -8,7 +8,7 @@ import logging
 ERROR_ARGS = 2
 ERROR_NOMATCH = 4
 
-RULE_TYPES = 'n', 'raw', 'glob', 'ere'
+RULE_TYPES = 'n', 'raw', 'glob', 'regex'
 
 logging.basicConfig(level=logging.WARNING, format='%(levelname)s:%(message)s')
 
@@ -79,10 +79,10 @@ def predicate_glob(pattern, cwd):
     return fnmatch.fnmatch(name, pattern)
 
 
-def predicate_ere(pattern, cwd):
+def predicate_regex(pattern, cwd):
     name = os.path.basename(cwd)
     found = re.search(pattern, name)
-    logging.debug('(ere) %s -> pattern=%r; name=%r; found=%r',
+    logging.debug('(regex) %s -> pattern=%r; name=%r; found=%r',
                   cwd, pattern, name, found)
     return bool(found)
 
@@ -90,7 +90,7 @@ def predicate_ere(pattern, cwd):
 predicate_by_ruletype = {
     'raw': predicate_raw,
     'glob': predicate_glob,
-    'ere': predicate_ere,
+    'regex': predicate_regex,
 }
 
 

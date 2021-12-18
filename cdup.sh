@@ -162,7 +162,7 @@ up() {
 					fi
 					;;
 				-E*)
-					rule_type="ere"
+					rule_type="regex"
 					if [ -n "${1:2}" ]; then
 						rule_value="${1:2}"
 					elif [ -n "$2" ]; then
