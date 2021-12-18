@@ -203,7 +203,7 @@ up() {
 	fi
 	if [ -n "$listonly" ]; then
 		echo "$todir"
-	else
+	elif [ "$todir" != "$(pwd)" ]; then
 		# Mean to fail if cd fails
 		# shellcheck disable=SC2164
 		cd "$todir"
