@@ -38,8 +38,8 @@ UPWARD_RULE
 The order of OPTIONS and UPWARD_RULE does not matter, and can be interleaved.
 The optional \`--' marks the beginning of UPWARD_RULE. Short options cannot
 be merged together. Option with argument can be merged together. No
-UPWARD_RULE other than \`-n [NUM_LEVELS], -NUM_LEVELS' is allowed to reach
-the root directory (\`/').
+UPWARD_RULE other than \`-NUM_LEVELS' is allowed to reach the root
+directory (\`/').
 
 Error code
 
