@@ -19,19 +19,15 @@ UPWARD_RULE
     Can be one of:
 
         <Nothing>           Same as \`cd ..'
-        -n [NUM_LEVELS], -NUM_LEVELS
-                            Same as \`cd ..' NUM_LEVELS time but there will be
-                            only one \`cd' action in total. In the first form,
-                            NUM_LEVELS is default to 1 if not specified. In
-                            the second form, if NUM_LEVELS does not start with
-                            \`n' (in which case it falls back to the first
-                            form) and contains non-digit characters, or if
-                            NUM_LEVELS is empty, the entire \`-NUM_LEVELS'
-                            will be interpreted as \`NAME' (see below)
+        -NUM_LEVELS         Same as \`cd ..' NUM_LEVELS time but there will be
+                            only one \`cd' action in total. If NUM_LEVELS
+                            contains non-digit characters, or if NUM_LEVELS
+                            is empty, the entire \`-NUM_LEVELS' will be
+                            interpreted as \`NAME' (see below). If NUM_LEVELS
+                            is \`0', nothing will be done
         [-r] NAME           Go upwards to the nearest directory named NAME.
-                            The optional \`-r' disambiguates conflicts with
-                            the \`/PATTERN/' rule below when NAME starts with
-                            a slash (\`/')
+                            The optional \`-r' disambiguates cases when NAME
+                            starts with \`-'
         -g PATTERN          Go upwards to the nearest directory matching the
                             python-style globbing pattern PATTERN. Be sure to
                             add quote around PATTERN to avoid unnecessary
@@ -120,23 +116,6 @@ up() {
 				return 2
 			fi
 			case "$1" in
-				-n*)
-					rule_type="n"
-					if [ -n "${1:2}" ]; then
-						rule_value="${1:2}"
-					elif [ -n "$2" ]; then
-						rule_value="$2"
-						shift
-					else
-						rule_value=1
-					fi
-					case "$rule_value" in
-						*[!0-9]*)
-							echo "NUM_LEVELS should be int but got $rule_value" >&2
-							return 2
-							;;
-					esac
-					;;
 				-r*)
 					rule_type="raw"
 					if [ -n "${1:2}" ]; then
