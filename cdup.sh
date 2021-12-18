@@ -32,7 +32,7 @@ UPWARD_RULE
                             The optional \`-r' disambiguates conflicts with
                             the \`/PATTERN/' rule below when NAME starts with
                             a slash (\`/')
-        /PATTERN/           Go upwards to the nearest directory matching the
+        -g PATTERN          Go upwards to the nearest directory matching the
                             python-style globbing pattern PATTERN. Be sure to
                             add quote around PATTERN to avoid unnecessary
                             shell expansion
@@ -78,11 +78,12 @@ up() {
 
 	# cmd parsing related
 	local rule_begin=
+    #   set to 1 if one of the OPTIONS or `--' has been parsed in current loop
 	local option_parsed
 
 	# parse arguments
 	while [ -n "$1" ]; do
-		option_parsed=1
+		option_parsed=
 		if [ -z "$rule_begin" ]; then
 			case "$1" in
 				-h|--help)
@@ -91,6 +92,7 @@ up() {
 					;;
 				-l)
 					listonly=1
+					option_parsed=1
 					;;
 				-s*)
 					if [ -n "${1:2}" ]; then
@@ -99,15 +101,16 @@ up() {
 						subdir="$2"
 						shift
 					else
-						echo "DIR not specified" >&2
+						echo "DIR missing" >&2
 						return 2
 					fi
+					option_parsed=1
 					;;
 				--)
 					rule_begin=true
+					option_parsed=1
 					;;
 				*)
-					option_parsed=
 					;;
 			esac
 		fi
@@ -146,13 +149,16 @@ up() {
 						return 2
 					fi
 					;;
-				/*/)
+				-g*)
 					rule_type="glob"
-					if [ -z "${1:1:-1}" ]; then
+					if [ -n "${1:2}" ]; then
+						rule_value="${1:2}"
+					elif [ -n "$2" ]; then
+						rule_vlaue="$2"
+						shift
+					else
 						echo "PATTERN missing" >&2
 						return 2
-					else
-						rule_value="${1:1:-1}"
 					fi
 					;;
 				-E*)
