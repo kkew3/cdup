@@ -13,6 +13,9 @@ OPTIONS
                             printed regardless of its existence
     -s DIR                  Going downwards to DIR after going upwards, such
                             that there's only one \`cd' action in total
+    -x COMMAND              Run COMMAND on the target directory; \`-x cd' is
+                            the default behavior; other examples include
+                            \`-x open' (on macOS) and \`-x "ls -l"'
 
 UPWARD_RULE
 
@@ -68,6 +71,7 @@ up() {
 
 	local listonly=
 	local subdir=
+	local cmd="cd"
 	local rule_value=
 	local rule_type=
 	local todir
@@ -98,6 +102,18 @@ up() {
 						shift
 					else
 						echo "DIR missing" >&2
+						return 2
+					fi
+					option_parsed=1
+					;;
+				-x*)
+					if [ -n "${1:2}" ]; then
+						cmd="${1:2}"
+					elif [ -n "$2" ]; then
+						cmd="$2"
+						shift
+					else
+						echo "COMMAND missing" >^&2
 						return 2
 					fi
 					option_parsed=1
@@ -188,6 +204,8 @@ up() {
 	fi
 	if [ -n "$listonly" ]; then
 		echo "$todir"
+	elif [ "$cmd" != "cd" ]; then
+		$cmd "$todir"
 	elif [ "$todir" != "$(pwd)" ]; then
 		# Mean to fail if cd fails
 		# shellcheck disable=SC2164
