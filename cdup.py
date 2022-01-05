@@ -111,9 +111,6 @@ def main():
         # In python3.x, TypeError is raised instead.
         pass
     sys.stdout.write(todir)
-    sys.stdout.write('\n')
-    sys.stdout.flush()
-    sys.exit(0)
 
 
 if __name__ == '__main__':
