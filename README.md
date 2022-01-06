@@ -8,6 +8,8 @@
 1. Adapt the code to your need (optional, see below)
 2. Source the absolute path of `cdup.sh`.
 
+If using `bash`, everything is fine. If using `zsh`, remember to add `setopt SH_WORD_SPLIT` to `~/.zshenv` so that `-x COMMAND` option works (see below).
+
 ### Adapt the code to your need
 
 At the beginning of `up` function definition in `cdup.sh`:
