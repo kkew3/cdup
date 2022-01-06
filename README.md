@@ -1,6 +1,6 @@
 # cdup
 
-`cd` up to several level from current working dirctory.
+`cd` up several levels from current working dirctory.
 
 
 ## Installation
