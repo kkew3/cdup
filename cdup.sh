@@ -78,7 +78,7 @@ up() {
 
 	# cmd parsing related
 	local rule_begin=
-    #   set to 1 if one of the OPTIONS or `--' has been parsed in current loop
+	# set to 1 if one of the OPTIONS or `--' has been parsed in current loop
 	local option_parsed
 
 	# parse arguments
