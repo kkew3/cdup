@@ -96,7 +96,7 @@ predicate_by_ruletype = {
 
 def main():
     ruletype, rulevalue, subsequent = parse_args()
-    cwd = os.path.abspath(getcwd())
+    cwd = getcwd()
     if ruletype == 'n':
         todir = upward_atmost(cwd, int(rulevalue))
     elif ruletype in RULE_TYPES:
