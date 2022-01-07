@@ -104,12 +104,8 @@ def main():
         todir = search_upward(cwd, c)
     else:
         sys.exit(ERROR_ARGS)
-    try:
+    if subsequent:
         todir = os.path.join(todir, subsequent)
-    except (TypeError, AttributeError):
-        # In python2.7, AttributeError is raised when subsequent is None;
-        # In python3.x, TypeError is raised instead.
-        pass
     sys.stdout.write(todir)
 
 
