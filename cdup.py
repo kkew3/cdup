@@ -15,26 +15,16 @@ logging.basicConfig(level=logging.WARNING, format='%(levelname)s:%(message)s')
 
 def parse_args():
     try:
-        ruletype = sys.argv[1]
-        rulevalue = sys.argv[2]
+        cwd = sys.argv[1]
+        ruletype = sys.argv[2]
+        rulevalue = sys.argv[3]
         try:
-            subsequent = sys.argv[3] or None
+            subsequent = sys.argv[4] or None
         except IndexError:
             subsequent = None
-        return ruletype, rulevalue, subsequent
+        return cwd, ruletype, rulevalue, subsequent
     except IndexError:
         sys.exit(ERROR_ARGS)
-
-
-def getcwd():
-    """
-    Not using ``os.getcwd()`` unless in Win32 because it resolves symlink as
-    per POSIX.1-2008 (IEEE Std 1003.1-2008). End user may adapt this function
-    to suit the underlying platform.
-    """
-    if sys.platform == 'win32':
-        return os.getcwd()
-    return os.environ['PWD']
 
 
 def search_upward(fromdir, condition):
@@ -95,8 +85,7 @@ predicate_by_ruletype = {
 
 
 def main():
-    ruletype, rulevalue, subsequent = parse_args()
-    cwd = getcwd()
+    cwd, ruletype, rulevalue, subsequent = parse_args()
     if ruletype == 'n':
         todir = upward_atmost(cwd, int(rulevalue))
     elif ruletype in RULE_TYPES:

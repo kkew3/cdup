@@ -197,7 +197,8 @@ up() {
 		rule_value=1
 	fi
 
-	todir="$("$up_pythonbin" "$up_backend" "$rule_type" "$rule_value" "$subdir")"
+	local cwd="$(pwd)"
+	todir="$("$up_pythonbin" "$up_backend" "$cwd" "$rule_type" "$rule_value" "$subdir")"
 	local retcode="$?"
 	if [ "$retcode" != 0 ]; then
 		return "$retcode"
@@ -206,7 +207,7 @@ up() {
 		echo "$todir"
 	elif [ "$cmd" != "cd" ]; then
 		$cmd "$todir"
-	elif [ "$todir" != "$(pwd)" ]; then
+	elif [ "$todir" != "$cwd" ]; then
 		# Mean to fail if cd fails
 		# shellcheck disable=SC2164
 		cd "$todir"
