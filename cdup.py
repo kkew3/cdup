@@ -24,6 +24,7 @@ def parse_args():
             subsequent = None
         return cwd, ruletype, rulevalue, subsequent
     except IndexError:
+        print('up: illegal command line arguments', file=sys.stderr)
         sys.exit(ERROR_ARGS)
 
 
@@ -46,6 +47,7 @@ def search_upward(fromdir, condition):
         if condition(cwd):
             return cwd
         next_cwd = os.path.dirname(cwd)
+    print("up: no match", file=sys.stderr)
     sys.exit(ERROR_NOMATCH)
 
 
@@ -92,6 +94,7 @@ def main():
         c = functools.partial(predicate_by_ruletype[ruletype], rulevalue)
         todir = search_upward(cwd, c)
     else:
+        print('up: invalid rule type', file=sys.stderr)
         sys.exit(ERROR_ARGS)
     if subsequent:
         todir = os.path.join(todir, subsequent)
