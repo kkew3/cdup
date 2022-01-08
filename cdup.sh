@@ -60,14 +60,15 @@ up() {
 	# compatible with bash then zsh;
 	# reference: https://stackoverflow.com/a/54755784/7881370
 	local up_basedir=$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")
-	local up_backend="$up_basedir/__pycache__/cdup.cpython-36.pyc"
-	if [ ! -f "$up_backend" ]; then
-		up_backend="$up_basedir/cdup.py"
-	elif [ "$up_backend" -ot "$up_basedir/cdup.py" ]; then
-		rm "$up_backend"
-		up_backend="$up_basedir/cdup.py"
+	local up_py_backend=
+	local up_pythonbin=
+	local up_rs_backend="$up_basedir/rs_backend"
+	if [ ! -f "$up_rs_backend" ]; then
+		echo "rs_backend not built yet; downgrading to Python backend" >&2
+		up_rs_backend=
+		up_py_backend="$up_basedir/cdup.py"
+		up_pythonbin=python3
 	fi
-	local up_pythonbin="/Library/Frameworks/Python.framework/Versions/3.6/bin/python3.6"
 
 	local listonly=
 	local subdir=
@@ -198,7 +199,11 @@ up() {
 	fi
 
 	local cwd="$(pwd)"
-	todir="$("$up_pythonbin" "$up_backend" "$cwd" "$rule_type" "$rule_value" "$subdir")"
+	if [ -n "$up_rs_backend" ]; then
+		todir="$("$up_rs_backend" "$cwd" "$rule_type" "$rule_value" "$subdir")"
+	else
+		todir="$("$up_pythonbin" "$up_py_backend" "$cwd" "$rule_type" "$rule_value" "$subdir")"
+	fi
 	local retcode="$?"
 	if [ "$retcode" != 0 ]; then
 		return "$retcode"

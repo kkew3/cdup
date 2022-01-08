@@ -1,3 +1,7 @@
 rt/
 .idea/
 __pycache__/
+
+cdup_rs_backend/Cargo.lock
+cdup_rs_backend/target/
+/rs_backend

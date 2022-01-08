@@ -5,21 +5,23 @@
 
 ## Installation
 
-1. Adapt the code to your need (optional, see below)
-2. Source the absolute path of `cdup.sh`.
+1. `git clone` the repository to `directory_of_your_choice`:
+
+2. Build the [Rust](https://www.rust-lang.org) backend
+
+If not already installed `cargo`, [install it](https://doc.rust-lang.org/cargo/getting-started/installation.html).
+And then,
+
+```sh
+cd "directory_of_your_choice/cdup_rs_backend"
+cargo build --release
+cd ..
+ln -s directory_of_your_choice/cdup_rs_backend/target/release/cdup_rs_backend rs_backend
+```
+
+3. Source the absolute path of `cdup.sh`.
 
 If using `bash`, everything is fine. If using `zsh`, remember to add `setopt SH_WORD_SPLIT` to `~/.zshenv` so that `-x COMMAND` option works (see below).
-
-### Adapt the code to your need
-
-At the beginning of `up` function definition in `cdup.sh`:
-
-- `up` requires local environment variable `up_backend` to point to the
-  `cdup.py` or its compiled `pyc` file (to reduce setup overhead). One may
-  compile `cdup.py` one his/her machine and set `up_backend` to the compiled
-  file.
-- `up` requires local environment variable `up_pythonbin` to point to the
-  python executable to use to run `cdup.py`. Python 2.7-3.x are supported.
 
 
 ## Usage
@@ -70,13 +72,14 @@ directory (`/').
 
 Error code
 
-    0                       Successs
-    1                       cd error (`No such file or directory'). This
+      0                     Successs
+      1                     cd error (`No such file or directory'). This
                             error is most often triggered by `-s' option as
                             unable to target directory upward will lead to
                             return code 4
-    2                       Cmd argument error
-    4                       Cannot find the target directory upward
+      2                     Cmd argument error
+      4                     Cannot find the target directory upward
+    128                     Backend not found
 ```
 
 One difference from "`cd ..` for N times" is that `up` function addresses the `OLDPWD` better than `cd ..` multiple times.
@@ -86,6 +89,10 @@ Several use cases:
 	/home/user/directory1/directory2:$ up
 	/home/user/directory1:$ 
 
+	/home/user/directory1/directory2:$ up -3
+	/home:$ cd -
+	/home/user/directory1/directory2:$
+
 	/home/user/directory1/directory2:$ up user
 	/home/user:$ cd -
 	/home/user/directory1/directory2:$ 
@@ -93,6 +100,17 @@ Several use cases:
 	/home/user/directory1/directory2:$ up -g'd*1'
 	/home/user/directory1:$ cd -
 	/home/user/directory1/directory2:$ 
+
+	/home/user/directory1/directory2:$ up -Ey1
+	/home/user/directory1:$
+
+
+## Profiling
+
+- `cd ../../..`: 0.014s
+- `up -3`: 0.020s
+
+Using `up [-r] NAME`, `up -g PATTERN`, or `up -E REGEX` shouldn't induce more time than 0.005s compared with `up -NUM_LEVELS`.
 
 
 ## Similar projects
