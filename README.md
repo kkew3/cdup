@@ -72,14 +72,13 @@ directory (`/').
 
 Error code
 
-      0                     Successs
-      1                     cd error (`No such file or directory'). This
+    0                       Successs
+    1                       cd error (`No such file or directory'). This
                             error is most often triggered by `-s' option as
                             unable to target directory upward will lead to
                             return code 4
-      2                     Cmd argument error
-      4                     Cannot find the target directory upward
-    128                     Backend not found
+    2                       Cmd argument error
+    4                       Cannot find the target directory upward
 ```
 
 One difference from "`cd ..` for N times" is that `up` function addresses the `OLDPWD` better than `cd ..` multiple times.
