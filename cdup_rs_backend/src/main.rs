@@ -89,8 +89,7 @@ fn main() {
     }
 }
 
-fn upward_atmost(fromdir: &mut PathBuf, n: usize) {
-    let mut n = n;
+fn upward_atmost(fromdir: &mut PathBuf, mut n: usize) {
     while n > 0 {
         if !fromdir.pop() {
             break;
