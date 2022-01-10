@@ -21,54 +21,13 @@ fn main() {
     };
 
     if rule_type == "n" {
-        let n: usize = rule_value.parse().unwrap();
-        upward_atmost(&mut fromdir, n);
+        handle_n(&mut fromdir, &rule_value);
     } else if rule_type == "raw" {
-        let found = raw_search_upward(&mut fromdir, &rule_value);
-        if !found {
-            eprintln!("up: no match");
-            process::exit(ERROR_NOMATCH);
-        }
+        handle_raw(&mut fromdir, &rule_value);
     } else if rule_type == "glob" {
-        let pattern = match Pattern::new(&rule_value) {
-            Ok(pat) => pat,
-            Err(_) => {
-                eprintln!("up: invalid glob pattern");
-                process::exit(ERROR_ARGS);
-            }
-        };
-        match glob_search_upward(&mut fromdir, &pattern) {
-            Ok(found) => {
-                if !found {
-                    eprintln!("up: no match");
-                    process::exit(ERROR_NOMATCH);
-                }
-            }
-            Err(msg) => {
-                eprintln!("up: {}", msg);
-                process::exit(ERROR_ARGS);
-            }
-        }
+        handle_glob(&mut fromdir, &rule_value);
     } else if rule_type == "regex" {
-        let pattern = match Regex::new(&rule_value) {
-            Ok(pat) => pat,
-            Err(_) => {
-                eprintln!("up: invalid regex pattern");
-                process::exit(ERROR_ARGS);
-            }
-        };
-        match regex_search_upward(&mut fromdir, &pattern) {
-            Ok(found) => {
-                if !found {
-                    eprintln!("up: no match");
-                    process::exit(ERROR_NOMATCH);
-                }
-            }
-            Err(msg) => {
-                eprintln!("up: {}", msg);
-                process::exit(ERROR_ARGS);
-            }
-        }
+        handle_regex(&mut fromdir, &rule_value);
     } else {
         eprintln!("up: invalid rule type");
         process::exit(ERROR_ARGS);
@@ -83,6 +42,62 @@ fn main() {
             process::exit(ERROR_ARGS);
         }
         Some(s) => print!("{}", s),
+    }
+}
+
+fn handle_n(fromdir: &mut PathBuf, rule_value: &str) {
+    upward_atmost(fromdir, rule_value.parse::<usize>().unwrap());
+}
+
+fn handle_raw(fromdir: &mut PathBuf, rule_value: &str) {
+    let found = raw_search_upward(fromdir, rule_value);
+    if !found {
+        eprintln!("up: no match");
+        process::exit(ERROR_NOMATCH);
+    }
+}
+
+fn handle_glob(fromdir: &mut PathBuf, rule_value: &str) {
+    let pattern = match Pattern::new(rule_value) {
+        Ok(pat) => pat,
+        Err(_) => {
+            eprintln!("up: invalid glob pattern");
+            process::exit(ERROR_ARGS);
+        }
+    };
+    match glob_search_upward(fromdir, &pattern) {
+        Ok(found) => {
+            if !found {
+                eprintln!("up: no match");
+                process::exit(ERROR_NOMATCH);
+            }
+        }
+        Err(msg) => {
+            eprintln!("up: {}", msg);
+            process::exit(ERROR_ARGS);
+        }
+    }
+}
+
+fn handle_regex(fromdir: &mut PathBuf, rule_value: &str) {
+    let pattern = match Regex::new(rule_value) {
+        Ok(pat) => pat,
+        Err(_) => {
+            eprintln!("up: invalid regex pattern");
+            process::exit(ERROR_ARGS);
+        }
+    };
+    match regex_search_upward(fromdir, &pattern) {
+        Ok(found) => {
+            if !found {
+                eprintln!("up: no match");
+                process::exit(ERROR_NOMATCH);
+            }
+        }
+        Err(msg) => {
+            eprintln!("up: {}", msg);
+            process::exit(ERROR_ARGS);
+        }
     }
 }
 
