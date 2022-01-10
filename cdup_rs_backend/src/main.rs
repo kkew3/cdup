@@ -1,5 +1,6 @@
 use glob::Pattern;
 use regex::Regex;
+use std::env;
 use std::path::PathBuf;
 use std::process;
 
@@ -7,21 +8,17 @@ const ERROR_ARGS: i32 = 2;
 const ERROR_NOMATCH: i32 = 4;
 
 fn main() {
-    let args: Vec<String> = std::env::args().collect();
-    if args.len() != 5 {
-        eprintln!("up: illegal command line arguments");
-        process::exit(ERROR_ARGS);
-    }
-
-    let mut fromdir = PathBuf::from(&args[1]); // assuming absolute directory
-    let rule_type = &args[2]; // assuming one of ["n", "raw", "glob", "regex"]
-    let rule_value = &args[3]; // assuming parseable as int if rule_type == "n"
-    let subsequent_dir;
-    if args[4] == "" {
-        subsequent_dir = None;
-    } else {
-        subsequent_dir = Some(&args[4]);
-    }
+    // assuming absolute directory
+    let mut fromdir = PathBuf::from(env::args().nth(1).unwrap());
+    // assuming one of ["n", "raw", "glob", "regex"]
+    let rule_type = env::args().nth(2).unwrap();
+    // assuming parseable as usize if rule_type == "n"
+    let rule_value = env::args().nth(3).unwrap();
+    let subsequent_dir = env::args().nth(4).unwrap();
+    let subsequent_dir = match subsequent_dir.as_str() {
+        "" => None,
+        s => Some(s),
+    };
 
     if rule_type == "n" {
         let n: usize = rule_value.parse().unwrap();
@@ -33,7 +30,7 @@ fn main() {
             process::exit(ERROR_NOMATCH);
         }
     } else if rule_type == "glob" {
-        let pattern = match Pattern::new(rule_value) {
+        let pattern = match Pattern::new(&rule_value) {
             Ok(pat) => pat,
             Err(_) => {
                 eprintln!("up: invalid glob pattern");
@@ -53,7 +50,7 @@ fn main() {
             }
         }
     } else if rule_type == "regex" {
-        let pattern = match Regex::new(rule_value) {
+        let pattern = match Regex::new(&rule_value) {
             Ok(pat) => pat,
             Err(_) => {
                 eprintln!("up: invalid regex pattern");
