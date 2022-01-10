@@ -7,6 +7,12 @@ use std::process;
 const ERROR_ARGS: i32 = 2;
 const ERROR_NOMATCH: i32 = 4;
 
+#[derive(Debug)]
+enum ErrorType {
+    NoMatch,
+    InvalidUnicode,
+}
+
 fn main() {
     // assuming absolute directory
     let mut fromdir = PathBuf::from(env::args().nth(1).unwrap());
@@ -50,10 +56,18 @@ fn handle_n(fromdir: &mut PathBuf, rule_value: &str) {
 }
 
 fn handle_raw(fromdir: &mut PathBuf, rule_value: &str) {
-    let found = raw_search_upward(fromdir, rule_value);
-    if !found {
-        eprintln!("up: no match");
-        process::exit(ERROR_NOMATCH);
+    match raw_search_upward(fromdir, rule_value) {
+        Ok(()) => (),
+        Err(ErrorType::NoMatch) => {
+            eprintln!("up: no match");
+            process::exit(ERROR_NOMATCH);
+        }
+        Err(ErrorType::InvalidUnicode) => {
+            // this arm shouldn't be reached since raw_search_upward should not
+            // return InvalidUnicode
+            eprintln!("up: invalid Unicode in \"{:?}\"", fromdir);
+            process::exit(ERROR_ARGS);
+        }
     }
 }
 
@@ -66,14 +80,13 @@ fn handle_glob(fromdir: &mut PathBuf, rule_value: &str) {
         }
     };
     match glob_search_upward(fromdir, &pattern) {
-        Ok(found) => {
-            if !found {
-                eprintln!("up: no match");
-                process::exit(ERROR_NOMATCH);
-            }
+        Ok(()) => (),
+        Err(ErrorType::NoMatch) => {
+            eprintln!("up: no match");
+            process::exit(ERROR_NOMATCH);
         }
-        Err(msg) => {
-            eprintln!("up: {}", msg);
+        Err(ErrorType::InvalidUnicode) => {
+            eprintln!("up: invalid Unicode in \"{:?}\"", fromdir);
             process::exit(ERROR_ARGS);
         }
     }
@@ -88,14 +101,13 @@ fn handle_regex(fromdir: &mut PathBuf, rule_value: &str) {
         }
     };
     match regex_search_upward(fromdir, &pattern) {
-        Ok(found) => {
-            if !found {
-                eprintln!("up: no match");
-                process::exit(ERROR_NOMATCH);
-            }
+        Ok(()) => (),
+        Err(ErrorType::NoMatch) => {
+            eprintln!("up: no match");
+            process::exit(ERROR_NOMATCH);
         }
-        Err(msg) => {
-            eprintln!("up: {}", msg);
+        Err(ErrorType::InvalidUnicode) => {
+            eprintln!("up: invalid Unicode in \"{:?}\"", fromdir);
             process::exit(ERROR_ARGS);
         }
     }
@@ -110,7 +122,10 @@ fn upward_atmost(fromdir: &mut PathBuf, mut n: usize) {
     }
 }
 
-fn raw_search_upward(fromdir: &mut PathBuf, name: &str) -> bool {
+fn raw_search_upward(
+    fromdir: &mut PathBuf,
+    name: &str,
+) -> Result<(), ErrorType> {
     loop {
         if !fromdir.pop() {
             break;
@@ -119,19 +134,19 @@ fn raw_search_upward(fromdir: &mut PathBuf, name: &str) -> bool {
             None => break,
             Some(basename) => {
                 if basename == name {
-                    return true;
+                    return Ok(());
                 }
             }
         }
     }
 
-    false
+    Err(ErrorType::NoMatch)
 }
 
 fn glob_search_upward(
     fromdir: &mut PathBuf,
     pattern: &Pattern,
-) -> Result<bool, String> {
+) -> Result<(), ErrorType> {
     loop {
         if !fromdir.pop() {
             break;
@@ -139,25 +154,23 @@ fn glob_search_upward(
         match fromdir.file_name() {
             None => break,
             Some(basename) => match basename.to_str() {
-                None => {
-                    return Err(format!("invalid Unicode in \"{:?}\"", fromdir))
-                }
+                None => return Err(ErrorType::InvalidUnicode),
                 Some(basename) => {
                     if pattern.matches(basename) {
-                        return Ok(true);
+                        return Ok(());
                     }
                 }
             },
         }
     }
 
-    Ok(false)
+    Err(ErrorType::NoMatch)
 }
 
 fn regex_search_upward(
     fromdir: &mut PathBuf,
     pattern: &Regex,
-) -> Result<bool, String> {
+) -> Result<(), ErrorType> {
     loop {
         if !fromdir.pop() {
             break;
@@ -165,19 +178,17 @@ fn regex_search_upward(
         match fromdir.file_name() {
             None => break,
             Some(basename) => match basename.to_str() {
-                None => {
-                    return Err(format!("invalid Unicode in \"{:?}\"", fromdir))
-                }
+                None => return Err(ErrorType::InvalidUnicode),
                 Some(basename) => {
                     if pattern.is_match(basename) {
-                        return Ok(true);
+                        return Ok(());
                     }
                 }
             },
         }
     }
 
-    Ok(false)
+    Err(ErrorType::NoMatch)
 }
 
 #[cfg(test)]
@@ -187,24 +198,33 @@ mod tests {
     #[test]
     fn test_raw_search_upward() {
         let mut path = PathBuf::from("/hello/world");
-        assert_eq!(raw_search_upward(&mut path, "world"), false);
+        assert!(matches!(
+            raw_search_upward(&mut path, "world").unwrap_err(),
+            ErrorType::NoMatch
+        ));
 
         let mut path = PathBuf::from("/hello/world");
-        assert_eq!(raw_search_upward(&mut path, "hell"), false);
+        assert!(matches!(
+            raw_search_upward(&mut path, "hell").unwrap_err(),
+            ErrorType::NoMatch
+        ));
 
         let mut path = PathBuf::from("/hello/world");
-        assert_eq!(raw_search_upward(&mut path, ""), false);
+        assert!(matches!(
+            raw_search_upward(&mut path, "").unwrap_err(),
+            ErrorType::NoMatch
+        ));
 
         let mut path = PathBuf::from("/hello/world/again");
-        assert_eq!(raw_search_upward(&mut path, "world"), true);
+        assert_eq!(raw_search_upward(&mut path, "world").unwrap(), ());
         assert_eq!(path, PathBuf::from("/hello/world"));
 
         let mut path = PathBuf::from("/hello/world/again");
-        assert_eq!(raw_search_upward(&mut path, "hello"), true);
+        assert_eq!(raw_search_upward(&mut path, "hello").unwrap(), ());
         assert_eq!(path, PathBuf::from("/hello"));
 
         let mut path = PathBuf::from("/你好/世界/再一次");
-        assert_eq!(raw_search_upward(&mut path, "世界"), true);
+        assert_eq!(raw_search_upward(&mut path, "世界").unwrap(), ());
         assert_eq!(path, PathBuf::from("/你好/世界"));
     }
 
@@ -212,21 +232,24 @@ mod tests {
     fn test_glob_search_upward() {
         let mut path = PathBuf::from("/hello/world");
         let pat = Pattern::new("").unwrap();
-        assert_eq!(glob_search_upward(&mut path, &pat).unwrap(), false);
+        assert!(matches!(
+            glob_search_upward(&mut path, &pat).unwrap_err(),
+            ErrorType::NoMatch
+        ));
 
         let mut path = PathBuf::from("/hello/world/again");
         let pat = Pattern::new("world").unwrap();
-        assert_eq!(glob_search_upward(&mut path, &pat).unwrap(), true);
+        assert_eq!(glob_search_upward(&mut path, &pat).unwrap(), ());
         assert_eq!(path, PathBuf::from("/hello/world"));
 
         let mut path = PathBuf::from("/hello/world/again");
         let pat = Pattern::new("wo*").unwrap();
-        assert_eq!(glob_search_upward(&mut path, &pat).unwrap(), true);
+        assert_eq!(glob_search_upward(&mut path, &pat).unwrap(), ());
         assert_eq!(path, PathBuf::from("/hello/world"));
 
         let mut path = PathBuf::from("/你好/世界/再一次");
         let pat = Pattern::new("*界").unwrap();
-        assert_eq!(glob_search_upward(&mut path, &pat).unwrap(), true);
+        assert_eq!(glob_search_upward(&mut path, &pat).unwrap(), ());
         assert_eq!(path, PathBuf::from("/你好/世界"));
     }
 
@@ -235,31 +258,34 @@ mod tests {
         // Note this test case
         let mut path = PathBuf::from("/hello/world");
         let pat = Regex::new("").unwrap();
-        assert_eq!(regex_search_upward(&mut path, &pat).unwrap(), true);
+        assert_eq!(regex_search_upward(&mut path, &pat).unwrap(), ());
         assert_eq!(path, PathBuf::from("/hello"));
 
         let mut path = PathBuf::from("/hello/world/again");
         let pat = Regex::new("^o").unwrap();
-        assert_eq!(regex_search_upward(&mut path, &pat).unwrap(), false);
+        assert!(matches!(
+            regex_search_upward(&mut path, &pat).unwrap_err(),
+            ErrorType::NoMatch
+        ));
 
         let mut path = PathBuf::from("/hello/world/again");
         let pat = Regex::new("world").unwrap();
-        assert_eq!(regex_search_upward(&mut path, &pat).unwrap(), true);
+        assert_eq!(regex_search_upward(&mut path, &pat).unwrap(), ());
         assert_eq!(path, PathBuf::from("/hello/world"));
 
         let mut path = PathBuf::from("/hello/world/again");
         let pat = Regex::new("wo.*").unwrap();
-        assert_eq!(regex_search_upward(&mut path, &pat).unwrap(), true);
+        assert_eq!(regex_search_upward(&mut path, &pat).unwrap(), ());
         assert_eq!(path, PathBuf::from("/hello/world"));
 
         let mut path = PathBuf::from("/hello/world/again");
         let pat = Regex::new("ll").unwrap();
-        assert_eq!(regex_search_upward(&mut path, &pat).unwrap(), true);
+        assert_eq!(regex_search_upward(&mut path, &pat).unwrap(), ());
         assert_eq!(path, PathBuf::from("/hello"));
 
         let mut path = PathBuf::from("/你好/世界/再一次");
         let pat = Regex::new("界").unwrap();
-        assert_eq!(regex_search_upward(&mut path, &pat).unwrap(), true);
+        assert_eq!(regex_search_upward(&mut path, &pat).unwrap(), ());
         assert_eq!(path, PathBuf::from("/你好/世界"));
     }
 }
