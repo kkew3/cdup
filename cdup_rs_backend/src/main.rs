@@ -239,6 +239,10 @@ mod tests {
         assert_eq!(path, PathBuf::from("/hello"));
 
         let mut path = PathBuf::from("/hello/world/again");
+        let pat = Regex::new("^o").unwrap();
+        assert_eq!(regex_search_upward(&mut path, &pat).unwrap(), false);
+
+        let mut path = PathBuf::from("/hello/world/again");
         let pat = Regex::new("world").unwrap();
         assert_eq!(regex_search_upward(&mut path, &pat).unwrap(), true);
         assert_eq!(path, PathBuf::from("/hello/world"));
