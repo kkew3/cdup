@@ -106,7 +106,7 @@ up() {
 						cmd="$2"
 						shift
 					else
-						echo "COMMAND missing" >^&2
+						echo "COMMAND missing" >&2
 						return 2
 					fi
 					option_parsed=1
