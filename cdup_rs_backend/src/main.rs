@@ -57,7 +57,7 @@ fn parse_args(args_iter: &mut env::Args) -> Cli {
     // assuming parseable as usize if rule_type == "n"
     let rule_value = args_iter.next().unwrap();
     let subsequent_dir = args_iter.next().unwrap();
-    let subsequent_dir = match subsequent_dir.as_str() {
+    let subsequent_dir = match &subsequent_dir[..] {
         "" => None,
         s => Some(String::from(s)),
     };
