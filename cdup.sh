@@ -8,9 +8,6 @@ usage: up [OPTIONS...] [[--] UPWARD_RULE]
 OPTIONS
 
     -h, --help              Show this help and return 0
-    -l                      Print the absolute target directory rather than
-                            actually cd to it; the target directory will be
-                            printed regardless of its existence
     -s DIR                  Going downwards to DIR after going upwards, such
                             that there's only one \`cd' action in total
     -x COMMAND              Run COMMAND on the target directory; \`-x cd' is
@@ -70,7 +67,6 @@ up() {
 		up_pythonbin=python3
 	fi
 
-	local listonly=
 	local subdir=
 	local cmd="cd"
 	local rule_value=
@@ -90,10 +86,6 @@ up() {
 				-h|--help)
 					__up_help
 					return 0
-					;;
-				-l)
-					listonly=1
-					option_parsed=1
 					;;
 				-s*)
 					if [ -n "${1:2}" ]; then
@@ -208,9 +200,7 @@ up() {
 	if [ "$retcode" != 0 ]; then
 		return "$retcode"
 	fi
-	if [ -n "$listonly" ]; then
-		echo "$todir"
-	elif [ "$cmd" != "cd" ]; then
+	if [ "$cmd" != "cd" ]; then
 		$cmd "$todir"
 	elif [ "$todir" != "$cwd" ]; then
 		# Mean to fail if cd fails
