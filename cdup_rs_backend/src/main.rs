@@ -14,13 +14,15 @@ enum ErrorType {
 }
 
 fn main() {
+    let mut args_iter = env::args();
+    let _ = args_iter.next();
     // assuming absolute directory
-    let mut fromdir = PathBuf::from(env::args().nth(1).unwrap());
+    let mut fromdir = PathBuf::from(args_iter.next().unwrap());
     // assuming one of ["n", "raw", "glob", "regex"]
-    let rule_type = env::args().nth(2).unwrap();
+    let rule_type = args_iter.next().unwrap();
     // assuming parseable as usize if rule_type == "n"
-    let rule_value = env::args().nth(3).unwrap();
-    let subsequent_dir = env::args().nth(4).unwrap();
+    let rule_value = args_iter.next().unwrap();
+    let subsequent_dir = args_iter.next().unwrap();
     let subsequent_dir = match subsequent_dir.as_str() {
         "" => None,
         s => Some(s),
