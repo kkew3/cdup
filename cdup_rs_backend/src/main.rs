@@ -13,11 +13,45 @@ enum ErrorType {
     InvalidUnicode,
 }
 
+struct Cli {
+    fromdir: PathBuf,
+    rule_type: String,
+    rule_value: String,
+    subsequent_dir: Option<String>,
+}
+
 fn main() {
-    let mut args_iter = env::args();
-    let _ = args_iter.next();
+    let mut cli = parse_args(&mut env::args());
+
+    if cli.rule_type == "n" {
+        handle_n(&mut cli.fromdir, &cli.rule_value);
+    } else if cli.rule_type == "raw" {
+        handle_raw(&mut cli.fromdir, &cli.rule_value);
+    } else if cli.rule_type == "glob" {
+        handle_glob(&mut cli.fromdir, &cli.rule_value);
+    } else if cli.rule_type == "regex" {
+        handle_regex(&mut cli.fromdir, &cli.rule_value);
+    } else {
+        eprintln!("up: invalid rule type");
+        process::exit(ERROR_ARGS);
+    }
+
+    if let Some(d) = cli.subsequent_dir {
+        cli.fromdir.push(d);
+    }
+    match cli.fromdir.to_str() {
+        None => {
+            eprintln!("up: invalid Unicode in {:?}", cli.fromdir);
+            process::exit(ERROR_ARGS);
+        }
+        Some(s) => print!("{}", s),
+    }
+}
+
+fn parse_args(args_iter: &mut env::Args) -> Cli {
+    let _bin = args_iter.next();
     // assuming absolute directory
-    let mut fromdir = PathBuf::from(args_iter.next().unwrap());
+    let fromdir = PathBuf::from(args_iter.next().unwrap());
     // assuming one of ["n", "raw", "glob", "regex"]
     let rule_type = args_iter.next().unwrap();
     // assuming parseable as usize if rule_type == "n"
@@ -25,31 +59,14 @@ fn main() {
     let subsequent_dir = args_iter.next().unwrap();
     let subsequent_dir = match subsequent_dir.as_str() {
         "" => None,
-        s => Some(s),
+        s => Some(String::from(s)),
     };
 
-    if rule_type == "n" {
-        handle_n(&mut fromdir, &rule_value);
-    } else if rule_type == "raw" {
-        handle_raw(&mut fromdir, &rule_value);
-    } else if rule_type == "glob" {
-        handle_glob(&mut fromdir, &rule_value);
-    } else if rule_type == "regex" {
-        handle_regex(&mut fromdir, &rule_value);
-    } else {
-        eprintln!("up: invalid rule type");
-        process::exit(ERROR_ARGS);
-    }
-
-    if let Some(d) = subsequent_dir {
-        fromdir.push(d);
-    }
-    match fromdir.to_str() {
-        None => {
-            eprintln!("up: invalid Unicode in {:?}", fromdir);
-            process::exit(ERROR_ARGS);
-        }
-        Some(s) => print!("{}", s),
+    Cli {
+        fromdir,
+        rule_type,
+        rule_value,
+        subsequent_dir,
     }
 }
 
