@@ -77,7 +77,7 @@ fn parse_args(args: &Vec<String>) -> Cli {
         option_parsed = false;
         if !rule_begin {
             if args[cur] == "-h" || args[cur] == "--help" {
-                println!(
+                eprintln!(
                     "\
 usage: up [OPTIONS...] [[--] UPWARD_RULE]
 
