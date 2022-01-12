@@ -34,14 +34,11 @@ usage: up [OPTIONS...] [[--] UPWARD_RULE]
 OPTIONS
 
     -h, --help              Show this help and return 0
+    -s DIR                  Going downwards to DIR after going upwards, such
+                            that there's only one `cd' action in total
     -l                      Print the absolute target directory rather than
                             actually cd to it; the target directory will be
                             printed regardless of its existence
-    -s DIR                  Going downwards to DIR after going upwards, such
-                            that there's only one `cd' action in total
-    -x COMMAND              Run COMMAND on the target directory; `-x cd' is
-                            the default behavior; other examples include
-                            `-x open' (on macOS) and `-x "ls -l"'
 
 UPWARD_RULE
 
