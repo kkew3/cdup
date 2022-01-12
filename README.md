@@ -107,7 +107,7 @@ Several use cases:
 ## Profiling
 
 - `cd ../../..`: 0.014s
-- `up -3`: 0.021s
+- `up -3`: 0.026s
 
 Using `up [-r] NAME`, `up -g PATTERN`, or `up -E REGEX` shouldn't induce more time than 0.005s compared with `up -NUM_LEVELS`.
 
