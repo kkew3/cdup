@@ -6,6 +6,7 @@ use std::process;
 
 const ERROR_ARGS: i32 = 2;
 const ERROR_NOMATCH: i32 = 4;
+const ERROR_SAMEDIR: i32 = 8;
 
 #[derive(Debug)]
 enum ErrorType {
@@ -22,6 +23,7 @@ struct Cli {
 
 fn main() {
     let mut cli = parse_args(&mut env::args());
+    let cwd = cli.fromdir.clone();
 
     if cli.rule_type == "n" {
         handle_n(&mut cli.fromdir, &cli.rule_value);
@@ -39,6 +41,11 @@ fn main() {
     if let Some(d) = cli.subsequent_dir {
         cli.fromdir.push(d);
     }
+
+    if cli.fromdir == cwd {
+        process::exit(ERROR_SAMEDIR);
+    }
+
     match cli.fromdir.to_str() {
         None => {
             eprintln!("up: invalid Unicode in {:?}", cli.fromdir);

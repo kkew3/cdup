@@ -187,12 +187,13 @@ up() {
 		todir="$("$up_pythonbin" "$up_py_backend" "$cwd" "$rule_type" "$rule_value" "$subdir")"
 	fi
 	local retcode="$?"
-	if [ "$retcode" != 0 ]; then
+	# retcode = 8 means SAMEDIR
+	if [ "$retcode" != 0 ] && [ "$retcode" != 8 ]; then
 		return "$retcode"
 	fi
 	if [ -n "$listonly" ]; then
 		echo "$todir"
-	elif [ "$todir" != "$cwd" ]; then
+	elif [ "$retcode" != 8 ]; then
 		# Mean to fail if cd fails
 		# shellcheck disable=SC2164
 		cd "$todir"

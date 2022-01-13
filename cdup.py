@@ -7,6 +7,7 @@ import logging
 
 ERROR_ARGS = 2
 ERROR_NOMATCH = 4
+ERROR_SAMEDIR = 8
 
 RULE_TYPES = 'n', 'raw', 'glob', 'regex'
 
@@ -98,6 +99,8 @@ def main():
         sys.exit(ERROR_ARGS)
     if subsequent:
         todir = os.path.join(todir, subsequent)
+    if os.path.isdir(todir) and os.path.samefile(todir, cwd):
+        sys.exit(ERROR_SAMEDIR)
     sys.stdout.write(todir)
 
 
