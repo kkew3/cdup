@@ -21,8 +21,6 @@ ln -s directory_of_your_choice/cdup_rs_backend/target/release/cdup_rs_backend rs
 
 3. Source the absolute path of `cdup.sh`.
 
-If using `bash`, everything is fine. If using `zsh`, remember to add `setopt SH_WORD_SPLIT` to `~/.zshenv` so that `-x COMMAND` option works (see below).
-
 
 ## Usage
 
@@ -104,7 +102,7 @@ Several use cases:
 ## Profiling
 
 - `cd ../../..`: 0.014s
-- `up -3`: 0.026s
+- `up -3`: 0.021s
 
 Using `up [-r] NAME`, `up -g PATTERN`, or `up -E REGEX` shouldn't induce more time than 0.005s compared with `up -NUM_LEVELS`.
 
