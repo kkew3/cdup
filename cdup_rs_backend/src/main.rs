@@ -42,16 +42,16 @@ fn main() {
         cli.fromdir.push(d);
     }
 
-    if cli.fromdir == cwd {
-        process::exit(ERROR_SAMEDIR);
-    }
-
     match cli.fromdir.to_str() {
         None => {
             eprintln!("up: invalid Unicode in {:?}", cli.fromdir);
             process::exit(ERROR_ARGS);
         }
         Some(s) => print!("{}", s),
+    }
+
+    if cli.fromdir == cwd {
+        process::exit(ERROR_SAMEDIR);
     }
 }
 
