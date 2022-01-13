@@ -91,7 +91,7 @@ fn handle_raw(fromdir: &mut PathBuf, rule_value: &str) {
         Err(ErrorType::InvalidUnicode) => {
             // this arm shouldn't be reached since raw_search_upward should not
             // return InvalidUnicode
-            eprintln!("up: invalid Unicode in \"{:?}\"", fromdir);
+            eprintln!("up: invalid Unicode in {:?}", fromdir);
             process::exit(ERROR_ARGS);
         }
     }
@@ -112,7 +112,7 @@ fn handle_glob(fromdir: &mut PathBuf, rule_value: &str) {
             process::exit(ERROR_NOMATCH);
         }
         Err(ErrorType::InvalidUnicode) => {
-            eprintln!("up: invalid Unicode in \"{:?}\"", fromdir);
+            eprintln!("up: invalid Unicode in {:?}", fromdir);
             process::exit(ERROR_ARGS);
         }
     }
@@ -133,7 +133,7 @@ fn handle_regex(fromdir: &mut PathBuf, rule_value: &str) {
             process::exit(ERROR_NOMATCH);
         }
         Err(ErrorType::InvalidUnicode) => {
-            eprintln!("up: invalid Unicode in \"{:?}\"", fromdir);
+            eprintln!("up: invalid Unicode in {:?}", fromdir);
             process::exit(ERROR_ARGS);
         }
     }
