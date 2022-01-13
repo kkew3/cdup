@@ -56,7 +56,7 @@ EOF
 up() {
 	# compatible with bash then zsh;
 	# reference: https://stackoverflow.com/a/54755784/7881370
-	local up_basedir=$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")
+	local up_basedir="$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")"
 	local up_py_backend=
 	local up_pythonbin=
 	local up_rs_backend="$up_basedir/rs_backend"

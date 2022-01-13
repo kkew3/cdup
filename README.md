@@ -21,8 +21,6 @@ ln -s directory_of_your_choice/cdup_rs_backend/target/release/cdup_rs_backend rs
 
 3. Source the absolute path of `cdup.sh`.
 
-If using `bash`, everything is fine. If using `zsh`, remember to add `setopt SH_WORD_SPLIT` to `~/.zshenv` so that `-x COMMAND` option works (see below).
-
 
 ## Usage
 
@@ -34,14 +32,11 @@ usage: up [OPTIONS...] [[--] UPWARD_RULE]
 OPTIONS
 
     -h, --help              Show this help and return 0
+    -s DIR                  Going downwards to DIR after going upwards, such
+                            that there's only one `cd' action in total
     -l                      Print the absolute target directory rather than
                             actually cd to it; the target directory will be
                             printed regardless of its existence
-    -s DIR                  Going downwards to DIR after going upwards, such
-                            that there's only one `cd' action in total
-    -x COMMAND              Run COMMAND on the target directory; `-x cd' is
-                            the default behavior; other examples include
-                            `-x open' (on macOS) and `-x "ls -l"'
 
 UPWARD_RULE
 
