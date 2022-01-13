@@ -10,9 +10,9 @@ OPTIONS
     -h, --help              Show this help and return 0
     -s DIR                  Going downwards to DIR after going upwards, such
                             that there's only one \`cd' action in total
-    -x COMMAND              Run COMMAND on the target directory; \`-x cd' is
-                            the default behavior; other examples include
-                            \`-x open' (on macOS) and \`-x "ls -l"'
+    -l                      Print the absolute target directory rather than
+                            actually cd to it; the target directory will be
+                            printed regardless of its existence
 
 UPWARD_RULE
 
@@ -67,8 +67,8 @@ up() {
 		up_pythonbin=python3
 	fi
 
+	local listonly=
 	local subdir=
-	local cmd="cd"
 	local rule_value=
 	local rule_type=
 	local todir
@@ -99,23 +99,13 @@ up() {
 					fi
 					option_parsed=1
 					;;
-				-x*)
-					if [ -n "${1:2}" ]; then
-						cmd="${1:2}"
-					elif [ -n "$2" ]; then
-						cmd="$2"
-						shift
-					else
-						echo "COMMAND missing" >&2
-						return 2
-					fi
+				-l)
+					listonly=1
 					option_parsed=1
 					;;
 				--)
-					rule_begin=true
+					rule_begin=1
 					option_parsed=1
-					;;
-				*)
 					;;
 			esac
 		fi
@@ -200,8 +190,8 @@ up() {
 	if [ "$retcode" != 0 ]; then
 		return "$retcode"
 	fi
-	if [ "$cmd" != "cd" ]; then
-		$cmd "$todir"
+	if [ -n "$listonly" ]; then
+		echo "$todir"
 	elif [ "$todir" != "$cwd" ]; then
 		# Mean to fail if cd fails
 		# shellcheck disable=SC2164
