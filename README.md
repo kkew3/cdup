@@ -34,7 +34,7 @@ OPTIONS
     -h, --help              Show this help and return 0
     -s DIR                  Going downwards to DIR after going upwards, such
                             that there's only one `cd' action in total;
-                            (quoted) globbing is supported in DIR
+                            (quoted) recursive globbing is supported in DIR
     -l                      Print the absolute target directory rather than
                             actually cd to it; the target directory will be
                             printed regardless of its existence
@@ -106,6 +106,8 @@ Several use cases:
 - `up -3`: 0.021s
 
 Using `up [-r] NAME`, `up -g PATTERN`, or `up -E REGEX` shouldn't induce more time than 0.005s compared with `up -NUM_LEVELS`.
+
+Using recursive globbing pattern `**` in `-s DIR` option can be time consuming.
 
 
 ## Similar projects
