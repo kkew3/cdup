@@ -5,7 +5,7 @@ use std::path::PathBuf;
 use std::process;
 
 const ERROR_ARGS: i32 = 2;
-const ERROR_NOMATCH: i32 = 4;
+const ERROR_MATCH: i32 = 4;
 const ERROR_SAMEDIR: i32 = 8;
 
 #[derive(Debug)]
@@ -18,7 +18,7 @@ struct Cli {
     fromdir: PathBuf,
     rule_type: String,
     rule_value: String,
-    subsequent_dir: Option<String>,
+    subsequent_pattern: Option<String>,
 }
 
 fn main() {
@@ -38,8 +38,8 @@ fn main() {
         process::exit(ERROR_ARGS);
     }
 
-    if let Some(d) = cli.subsequent_dir {
-        cli.fromdir.push(d);
+    if let Some(d) = cli.subsequent_pattern.as_ref() {
+        glob_downward(&mut cli.fromdir, d);
     }
 
     match cli.fromdir.to_str() {
@@ -63,8 +63,8 @@ fn parse_args(args_iter: &mut env::Args) -> Cli {
     let rule_type = args_iter.next().unwrap();
     // assuming parseable as usize if rule_type == "n"
     let rule_value = args_iter.next().unwrap();
-    let subsequent_dir = args_iter.next().unwrap();
-    let subsequent_dir = match &subsequent_dir[..] {
+    let subsequent_pattern = args_iter.next().unwrap();
+    let subsequent_pattern = match &subsequent_pattern[..] {
         "" => None,
         s => Some(String::from(s)),
     };
@@ -73,7 +73,7 @@ fn parse_args(args_iter: &mut env::Args) -> Cli {
         fromdir,
         rule_type,
         rule_value,
-        subsequent_dir,
+        subsequent_pattern,
     }
 }
 
@@ -86,7 +86,7 @@ fn handle_raw(fromdir: &mut PathBuf, rule_value: &str) {
         Ok(()) => (),
         Err(UpError::NoMatch) => {
             eprintln!("up: no match");
-            process::exit(ERROR_NOMATCH);
+            process::exit(ERROR_MATCH);
         }
         Err(UpError::InvalidUnicode) => {
             // this arm shouldn't be reached since raw_search_upward should not
@@ -109,7 +109,7 @@ fn handle_glob(fromdir: &mut PathBuf, rule_value: &str) {
         Ok(()) => (),
         Err(UpError::NoMatch) => {
             eprintln!("up: no match");
-            process::exit(ERROR_NOMATCH);
+            process::exit(ERROR_MATCH);
         }
         Err(UpError::InvalidUnicode) => {
             eprintln!("up: invalid Unicode in {:?}", fromdir);
@@ -130,11 +130,54 @@ fn handle_regex(fromdir: &mut PathBuf, rule_value: &str) {
         Ok(()) => (),
         Err(UpError::NoMatch) => {
             eprintln!("up: no match");
-            process::exit(ERROR_NOMATCH);
+            process::exit(ERROR_MATCH);
         }
         Err(UpError::InvalidUnicode) => {
             eprintln!("up: invalid Unicode in {:?}", fromdir);
             process::exit(ERROR_ARGS);
+        }
+    }
+}
+
+fn glob_downward(fromdir: &mut PathBuf, subsequent_pattern: &str) {
+    if let Err(_) = env::set_current_dir(&fromdir) {
+        eprintln!(
+            "up: failed to prepare to go downward by cd'ing first to {:?}",
+            fromdir
+        );
+        process::exit(ERROR_ARGS);
+    }
+    let paths = match glob::glob(subsequent_pattern) {
+        Ok(paths) => paths,
+        Err(_) => {
+            eprintln!("up: invalid glob pattern in DIR");
+            process::exit(ERROR_ARGS);
+        }
+    };
+    let mut instantiated_subsequent = Vec::new();
+    for entry in paths {
+        match entry {
+            Ok(path) => instantiated_subsequent.push(path),
+            Err(e) => {
+                eprintln!(
+                    "up: unreachable path occurred {:?}; skipped",
+                    e.path()
+                )
+            }
+        }
+        if instantiated_subsequent.len() > 1 {
+            break;
+        }
+    }
+    match instantiated_subsequent.len() {
+        0 => {
+            eprintln!("up: no match for DIR");
+            process::exit(ERROR_MATCH);
+        }
+        1 => fromdir.push(&instantiated_subsequent[0]),
+        _ => {
+            eprintln!("up: multiple matches for DIR");
+            process::exit(ERROR_MATCH);
         }
     }
 }
@@ -148,10 +191,7 @@ fn upward_atmost(fromdir: &mut PathBuf, mut n: usize) {
     }
 }
 
-fn raw_search_upward(
-    fromdir: &mut PathBuf,
-    name: &str,
-) -> Result<(), UpError> {
+fn raw_search_upward(fromdir: &mut PathBuf, name: &str) -> Result<(), UpError> {
     loop {
         if !fromdir.pop() {
             break;

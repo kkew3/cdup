@@ -3,10 +3,11 @@ import os
 import re
 import functools
 import fnmatch
+import glob
 import logging
 
 ERROR_ARGS = 2
-ERROR_NOMATCH = 4
+ERROR_MATCH = 4
 ERROR_SAMEDIR = 8
 
 RULE_TYPES = 'n', 'raw', 'glob', 'regex'
@@ -49,7 +50,7 @@ def search_upward(fromdir, condition):
             return cwd
         next_cwd = os.path.dirname(cwd)
     print("up: no match", file=sys.stderr)
-    sys.exit(ERROR_NOMATCH)
+    sys.exit(ERROR_MATCH)
 
 
 def upward_atmost(fromdir, n):
@@ -98,7 +99,16 @@ def main():
         print('up: invalid rule type', file=sys.stderr)
         sys.exit(ERROR_ARGS)
     if subsequent:
-        todir = os.path.join(todir, subsequent)
+        os.chdir(todir)
+        matched_subsequents = glob.glob(subsequent)
+        if not matched_subsequents:
+            print('up: no match for DIR', file=sys.stderr)
+            sys.exit(ERROR_MATCH)
+        elif len(matched_subsequents) > 1:
+            print('up: multiple matches for DIR', file=sys.stderr)
+            sys.exit(ERROR_MATCH)
+        else:
+            todir = os.path.join(todir, matched_subsequents[0])
     if os.path.isdir(todir) and os.path.samefile(todir, cwd):
         sys.exit(ERROR_SAMEDIR)
     sys.stdout.write(todir)
