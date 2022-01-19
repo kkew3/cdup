@@ -100,15 +100,20 @@ def main():
         sys.exit(ERROR_ARGS)
     if subsequent:
         os.chdir(todir)
-        matched_subsequents = glob.glob(subsequent)
-        if not matched_subsequents:
+        it = glob.iglob(subsequent, recursive=True)
+        try:
+            matched_subsequent = next(it)
+        except StopIteration:
             print('up: no match for DIR', file=sys.stderr)
             sys.exit(ERROR_MATCH)
-        elif len(matched_subsequents) > 1:
+        try:
+            _ = next(it)
+        except StopIteration:
+            pass
+        else:
             print('up: multiple matches for DIR', file=sys.stderr)
             sys.exit(ERROR_MATCH)
-        else:
-            todir = os.path.join(todir, matched_subsequents[0])
+        todir = os.path.join(todir, matched_subsequent)
     if os.path.isdir(todir) and os.path.samefile(todir, cwd):
         sys.exit(ERROR_SAMEDIR)
     sys.stdout.write(todir)
