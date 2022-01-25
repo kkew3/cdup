@@ -1,6 +1,7 @@
 use glob::Pattern;
 use regex::Regex;
 use std::env;
+use std::fs;
 use std::path::PathBuf;
 use std::process;
 
@@ -157,7 +158,26 @@ fn glob_downward(fromdir: &mut PathBuf, subsequent_pattern: &str) {
     let mut instantiated_subsequent = Vec::new();
     for entry in paths {
         match entry {
-            Ok(path) => instantiated_subsequent.push(path),
+            Ok(path) => {
+                let is_dir = match fs::metadata(&path) {
+                    Ok(meta) => meta.is_dir(),
+                    Err(_) => {
+                        // According to the doc, Err might be caused by:
+                        // "The user lacks permissions to perform metadata
+                        // call on path.", or "`path` does not exist."
+                        // Since `path` must exist here, the Err should
+                        // be caused by the former.
+                        //
+                        // Include this `path`
+                        // into the matched list since it could be a
+                        // directory.
+                        true
+                    }
+                };
+                if is_dir {
+                    instantiated_subsequent.push(path);
+                }
+            }
             Err(e) => {
                 eprintln!(
                     "up: unreachable path occurred {:?}; skipped",
