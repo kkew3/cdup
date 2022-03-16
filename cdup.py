@@ -81,6 +81,23 @@ def predicate_regex(pattern, cwd):
     return bool(found)
 
 
+def glob_downward(pattern):
+    matched_subsequents = []
+    for path in glob.iglob(pattern, recursive=True):
+        if os.path.isdir(path):
+            matched_subsequents.append(path)
+        if len(matched_subsequents) > 1:
+            break
+    n = len(matched_subsequents)
+    if n == 0:
+        print('up: no match for DIR', file=sys.stderr)
+        sys.exit(ERROR_MATCH)
+    if n == 1:
+        return matched_subsequents[0]
+    print('up: multiple matches for DIR', file=sys.stderr)
+    sys.exit(ERROR_MATCH)
+
+
 predicate_by_ruletype = {
     'raw': predicate_raw,
     'glob': predicate_glob,
@@ -100,19 +117,7 @@ def main():
         sys.exit(ERROR_ARGS)
     if subsequent:
         os.chdir(todir)
-        it = glob.iglob(subsequent, recursive=True)
-        try:
-            matched_subsequent = next(it)
-        except StopIteration:
-            print('up: no match for DIR', file=sys.stderr)
-            sys.exit(ERROR_MATCH)
-        try:
-            _ = next(it)
-        except StopIteration:
-            pass
-        else:
-            print('up: multiple matches for DIR', file=sys.stderr)
-            sys.exit(ERROR_MATCH)
+        matched_subsequent = glob_downward(subsequent)
         todir = os.path.join(todir, matched_subsequent)
     if os.path.isdir(todir) and os.path.samefile(todir, cwd):
         sys.exit(ERROR_SAMEDIR)
