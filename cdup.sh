@@ -95,7 +95,7 @@ up() {
 						subdir="$2"
 						shift
 					else
-						echo "DIR missing" >&2
+						echo "up: DIR missing" >&2
 						return 2
 					fi
 					option_parsed=1
@@ -112,7 +112,7 @@ up() {
 		fi
 		if [ -z "$option_parsed" ]; then
 			if [ -n "$rule_type" ] || [ -n "$rule_value" ]; then
-				echo "UPWARD_RULE has already been specified" >&2
+				echo "up: UPWARD_RULE has already been specified" >&2
 				return 2
 			fi
 			case "$1" in
@@ -124,7 +124,7 @@ up() {
 						rule_value="$2"
 						shift
 					else
-						echo "NAME missing" >&2
+						echo "up: NAME missing" >&2
 						return 2
 					fi
 					;;
@@ -136,7 +136,7 @@ up() {
 						rule_vlaue="$2"
 						shift
 					else
-						echo "PATTERN missing" >&2
+						echo "up: PATTERN missing" >&2
 						return 2
 					fi
 					;;
@@ -148,7 +148,7 @@ up() {
 						rule_value="$2"
 						shift
 					else
-						echo "REGEX missing" >&2
+						echo "up: REGEX missing" >&2
 						return 2
 					fi
 					;;
