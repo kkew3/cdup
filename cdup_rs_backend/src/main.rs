@@ -34,6 +34,8 @@ fn main() {
         handle_glob(&mut cli.fromdir, &cli.rule_value);
     } else if cli.rule_type == "regex" {
         handle_regex(&mut cli.fromdir, &cli.rule_value);
+    } else if cli.rule_type == "git" {
+        handle_git(&mut cli.fromdir);
     } else {
         eprintln!("up: invalid rule type");
         process::exit(ERROR_ARGS);
@@ -60,7 +62,7 @@ fn parse_args(args_iter: &mut env::Args) -> Cli {
     let _bin = args_iter.next();
     // assuming absolute directory
     let fromdir = PathBuf::from(args_iter.next().unwrap());
-    // assuming one of ["n", "raw", "glob", "regex"]
+    // assuming one of ["n", "raw", "glob", "regex", "git"]
     let rule_type = args_iter.next().unwrap();
     // assuming parseable as usize if rule_type == "n"
     let rule_value = args_iter.next().unwrap();
@@ -134,6 +136,22 @@ fn handle_regex(fromdir: &mut PathBuf, rule_value: &str) {
             process::exit(ERROR_MATCH);
         }
         Err(UpError::InvalidUnicode) => {
+            eprintln!("up: invalid Unicode in {:?}", fromdir);
+            process::exit(ERROR_ARGS);
+        }
+    }
+}
+
+fn handle_git(fromdir: &mut PathBuf) {
+    match git_search_upward(fromdir) {
+        Ok(()) => (),
+        Err(UpError::NoMatch) => {
+            eprintln!("up: no match");
+            process::exit(ERROR_MATCH);
+        }
+        Err(UpError::InvalidUnicode) => {
+            // this arm shouldn't be reached since git_search_upward should not
+            // return InvalidUnicode
             eprintln!("up: invalid Unicode in {:?}", fromdir);
             process::exit(ERROR_ARGS);
         }
@@ -272,6 +290,24 @@ fn regex_search_upward(
                 }
             },
         }
+    }
+
+    Err(UpError::NoMatch)
+}
+
+fn git_search_upward(
+    fromdir: &mut PathBuf,
+) -> Result<(), UpError> {
+    loop {
+        if !fromdir.pop() {
+            break;
+        }
+        fromdir.push(".git");
+        if fromdir.is_dir() {
+            fromdir.pop();
+            return Ok(());
+        }
+        fromdir.pop();
     }
 
     Err(UpError::NoMatch)

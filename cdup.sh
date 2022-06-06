@@ -35,6 +35,7 @@ UPWARD_RULE
                             shell expansion
         -E REGEX            Go upwards to the nearest directory matching the
                             python REGEX
+        -G                  Go upwards to the nearest Git root directory
 
 The order of OPTIONS and UPWARD_RULE does not matter, and can be interleaved.
 The optional \`--' marks the beginning of UPWARD_RULE. Short options cannot
@@ -151,6 +152,11 @@ up() {
 						echo "up: REGEX missing" >&2
 						return 2
 					fi
+					;;
+				-G)
+					rule_type="git"
+					# just a placeholder
+					rule_value=1
 					;;
 				-)
 					rule_type="raw"

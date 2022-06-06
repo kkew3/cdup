@@ -81,6 +81,10 @@ def predicate_regex(pattern, cwd):
     return bool(found)
 
 
+def predicate_git(_1, cwd):
+    return os.path.isdir(os.path.join(cwd, '.git'))
+
+
 def glob_downward(pattern):
     matched_subsequents = []
     for path in glob.iglob(pattern, recursive=True):
@@ -102,6 +106,7 @@ predicate_by_ruletype = {
     'raw': predicate_raw,
     'glob': predicate_glob,
     'regex': predicate_regex,
+    'git': predicate_git,
 }
 
 
