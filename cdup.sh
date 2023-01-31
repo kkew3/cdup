@@ -134,7 +134,7 @@ up() {
 					if [ -n "${1:2}" ]; then
 						rule_value="${1:2}"
 					elif [ -n "$2" ]; then
-						rule_vlaue="$2"
+						rule_value="$2"
 						shift
 					else
 						echo "up: PATTERN missing" >&2
